@@ -35,10 +35,9 @@ public class LineGenerator : MonoBehaviour
     List<ImageObject> leftImageObjects = new List<ImageObject>();
 
     void Start(){
-        leftImageObjects.Add(new ImageObject("Cat", "Hat", "left"));
-        leftImageObjects.Add(new ImageObject("Mouse", "House", "left"));
-        leftImageObjects.Add(new ImageObject("Saw", "Train", "left"));
-
+        leftImageObjects.Add(new ImageObject("cat", "hat", "left"));
+        leftImageObjects.Add(new ImageObject("mouse", "house", "left"));
+        leftImageObjects.Add(new ImageObject("saw", "train", "left"));
     }
 
     Line activeLine;
