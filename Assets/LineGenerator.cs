@@ -5,109 +5,102 @@ using UnityEngine;
 
 public class LineGenerator : MonoBehaviour
 {
-    public class ImageObject
-    {
-        public string colliderName;
-        public string counterColliderName;
-        public string side;
-        public bool successful = false;
-
-        public BoxCollider2D collider;
-        public BoxCollider2D counterCollider;
-
-        public ImageObject(string colliderName, string counterColliderName, string side){
-            this.colliderName = colliderName;
-            this.counterColliderName = counterColliderName;
-            this.side = side;
-
-            this.collider = GameObject.Find(colliderName).GetComponent<BoxCollider2D>();
-            this.counterCollider = GameObject.Find(counterColliderName).GetComponent<BoxCollider2D>();
-        }
-
-        public void SetSuccessful(bool successful){
-            this.successful = successful;
-        }
-    } 
-
-
     public GameObject linePrefab;
     public GameOverScreen gameOverScreen;
-    List<ImageObject> leftImageObjects = new List<ImageObject>();
+    public GameObject PictureGenerator;
+    List<PictureGenerator.Picture> pictures;
 
-    void Start(){
-        leftImageObjects.Add(new ImageObject("cat", "hat", "left"));
-        leftImageObjects.Add(new ImageObject("mouse", "house", "left"));
-        leftImageObjects.Add(new ImageObject("saw", "train", "left"));
+    void Start()
+    {
+        pictures = PictureGenerator.GetComponent<PictureGenerator>().pictures;
     }
 
     Line activeLine;
     GameObject newLine;
 
     // Update is called once per frame
-    void Update(){
-        if(Input.GetMouseButtonDown(0)){
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
             Debug.Log("mouse down");
 
             newLine = Instantiate(linePrefab);
             activeLine = newLine.GetComponent<Line>();
         }
 
-        if(Input.GetMouseButtonUp(0)){
+        if (Input.GetMouseButtonUp(0))
+        {
             activeLine = null;
             List<Vector2> points = newLine.GetComponent<Line>().GetPoints();
             Debug.Log(points.Count);
 
-            if(points.Count > 1){
-                if(isPointsSuccessful(points)){
+            if (points.Count > 1)
+            {
+                if (isPointsSuccessful(points))
+                {
                     Debug.Log("Success!");
-                } else {
+                }
+                else
+                {
                     Debug.Log("Fail no points successful!");
                     Destroy(newLine);
                 }
-            } else {
+            }
+            else
+            {
                 Debug.Log("Fail no lines exists!");
                 Destroy(newLine);
             }
 
-            if(isAllSuccessful()){
-                //Debug.Log("All successful!");
+            if (isAllSuccessful())
+            {
                 GameOver();
             }
 
-            //LogAllImageObjects();
         }
 
-        if(activeLine != null){
+        if (activeLine != null)
+        {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             activeLine.UpdateLine(mousePos);
         }
     }
 
-    bool isPointsSuccessful(List<Vector2> points){
+    bool isPointsSuccessful(List<Vector2> points)
+    {
         Vector2 firstPoint = points[0];
         Vector2 lastPoint = points[points.Count - 1];
 
-        foreach(ImageObject imageObject in leftImageObjects){
-            if(imageObject.collider.bounds.Contains(firstPoint)){
+        foreach (PictureGenerator.Picture picture in pictures)
+        {
+            if (picture.collider.bounds.Contains(firstPoint))
+            {
                 Debug.Log("first point inside left image");
-                if(imageObject.counterCollider.bounds.Contains(lastPoint)){
-                    if(imageObject.successful){
+                if (picture.counterCollider.bounds.Contains(lastPoint))
+                {
+                    if (picture.successful)
+                    {
                         Debug.Log("Already successful!");
                         return false;
                     }
                     Debug.Log("Success!");
-                    imageObject.SetSuccessful(true);
+                    picture.SetSuccessful(true);
                     return true;
                 }
-            } else if(imageObject.counterCollider.bounds.Contains(firstPoint)){
+            }
+            else if (picture.counterCollider.bounds.Contains(firstPoint))
+            {
                 Debug.Log("first point inside right image");
-                if(imageObject.collider.bounds.Contains(lastPoint)){
-                    if(imageObject.successful){
+                if (picture.collider.bounds.Contains(lastPoint))
+                {
+                    if (picture.successful)
+                    {
                         Debug.Log("Already successful!");
                         return false;
                     }
                     Debug.Log("Success!");
-                    imageObject.SetSuccessful(true);
+                    picture.SetSuccessful(true);
                     return true;
                 }
             }
@@ -115,32 +108,28 @@ public class LineGenerator : MonoBehaviour
         return false;
     }
 
-    bool isAllSuccessful(){
-        foreach(ImageObject imageObject in leftImageObjects){
-            if(!imageObject.successful){
+    bool isAllSuccessful()
+    {
+        foreach (PictureGenerator.Picture picture in pictures)
+        {
+            if (!picture.successful)
+            {
                 return false;
             }
         }
         return true;
     }
 
-    public void Reset(){
-        foreach(ImageObject imageObject in leftImageObjects){
-            imageObject.SetSuccessful(false);
-        }
-
-        foreach(GameObject line in GameObject.FindGameObjectsWithTag("Line")){
+    public void Reset()
+    {
+        foreach (GameObject line in GameObject.FindGameObjectsWithTag("Line"))
+        {
             Destroy(line);
         }
     }
 
-    void LogAllImageObjects(){
-        foreach(ImageObject imageObject in leftImageObjects){
-            Debug.Log(imageObject.colliderName + " " + imageObject.successful);
-        }
-    }
-
-    void GameOver(){
+    void GameOver()
+    {
         gameOverScreen.Setup();
     }
 }

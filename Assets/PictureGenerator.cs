@@ -4,34 +4,134 @@ using UnityEngine;
 
 public class PictureGenerator : MonoBehaviour
 {
+
+    public class Picture
+    {
+        public string name;
+        public string counterName;
+        public bool successful = false;
+
+        public BoxCollider2D collider;
+        public BoxCollider2D counterCollider;
+
+        public Picture(string name, string counterName)
+        {
+            this.name = name;
+            this.counterName = counterName;
+        }
+
+        public void SetSuccessful(bool successful)
+        {
+            this.successful = successful;
+        }
+
+        public void SetCollider(BoxCollider2D collider)
+        {
+            this.collider = collider;
+        }
+
+        public void SetCounterCollider(BoxCollider2D counterCollider)
+        {
+            this.counterCollider = counterCollider;
+        }
+    }
+
+
+
     public GameObject picturePrefab;
-    // Start is called before the first frame update
+    public List<Picture> pictures = new List<Picture>();
+    List<int> leftYPositions = new List<int>();
+    List<int> rightYPositions = new List<int>();
+    List<int> tmpLeftYPositions = new List<int>();
+    List<int> tmpRightYPositions = new List<int>();
+
     void Start()
     {
+        pictures.Add(new Picture("cat", "hat"));
+        pictures.Add(new Picture("mouse", "house"));
+        pictures.Add(new Picture("saw", "train"));
 
-        InstantiatePicture("mouse", "left", -5);
-        InstantiatePicture("cat", "left", 1);
-        InstantiatePicture("saw", "left", -2);
+        leftYPositions.Add(1);
+        leftYPositions.Add(-2);
+        leftYPositions.Add(-5);
 
-        InstantiatePicture("hat", "right", 1);
-        InstantiatePicture("train", "right", -2);
-        InstantiatePicture("house", "right", -5);
+        rightYPositions.Add(1);
+        rightYPositions.Add(-2);
+        rightYPositions.Add(-5);
+
+        InstantiatePictures();
+    }
+
+    public void Reset()
+    {
+        foreach (Picture picture in pictures)
+        {
+            picture.successful = false;
+        }
+        DestroyPictures();
+        InstantiatePictures();
+    }
+
+    void DestroyPictures()
+    {
+        foreach (Picture picture in pictures)
+        {
+            Destroy(GameObject.Find(picture.name));
+            Destroy(GameObject.Find(picture.counterName));
+        }
+    }
+
+    void InstantiatePictures()
+    {
+        tmpLeftYPositions.AddRange(leftYPositions);
+        tmpRightYPositions.AddRange(rightYPositions);
+        foreach (Picture picture in pictures)
+        {
+            string side = "left"; // Random side seems to be a bit buggy
+            int randomLeftYPosition = Random.Range(0, tmpLeftYPositions.Count);
+            int randomRightYPosition = Random.Range(0, tmpRightYPositions.Count);
+
+            GameObject pictureGO = InstantiatePicture(picture.name, side, tmpLeftYPositions[randomLeftYPosition]);
+            GameObject counterPictureGO = InstantiatePicture(picture.counterName, side == "left" ? "right" : "left", tmpRightYPositions[randomRightYPosition]);
+
+            picture.SetCollider(pictureGO.GetComponent<BoxCollider2D>());
+            picture.SetCounterCollider(counterPictureGO.GetComponent<BoxCollider2D>());
+
+            tmpLeftYPositions.RemoveAt(randomLeftYPosition);
+            tmpRightYPositions.RemoveAt(randomRightYPosition);
+        }
 
 
     }
 
-    void InstantiatePicture(string asset, string side, int yPos)
+    GameObject InstantiatePicture(string asset, string side, int yPos)
     {
         // Instantiate picture on left or right side
         GameObject picture = Instantiate(picturePrefab);
         picture.name = asset;
 
-        int xPos = side == "left" ? -3 : 15;
-        picture.transform.position = new Vector3(xPos, yPos, 0);
-
         // Load sprite from Resources/Sprites folder and set it as the picture's sprite
         Sprite sprite = Resources.Load<Sprite>("Sprites/" + asset);
         SpriteRenderer renderer = picture.GetComponent<SpriteRenderer>();
         renderer.sprite = sprite;
+
+        // Calculate left and right pos based on screen width
+        float leftPos = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0)).x;
+        float rightPos = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x;
+        int xPos = side == "left" ? (int)(leftPos+1.55f) : (int)(rightPos-1.2f);
+        picture.transform.position = new Vector3(xPos, yPos, 0);
+
+        // Set sprite max height to 1/3 of screen height and a little bit of margin
+        float screenHeight = Camera.main.orthographicSize * 2;
+        float spriteHeight = sprite.bounds.size.y + 8;
+        float scale = (screenHeight / spriteHeight / 3);
+        picture.transform.localScale = new Vector3(scale, scale, 1);
+
+        // Set collider size to match sprite size
+        BoxCollider2D collider = picture.GetComponent<BoxCollider2D>();
+        collider.size = sprite.bounds.size;
+
+        return picture;
+
     }
 }
