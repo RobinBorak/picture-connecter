@@ -40,11 +40,9 @@ public class LineGenerator : MonoBehaviour
             {
                 return;
             }
-            activeLine = null;
 
             Debug.Log("mouse up");
-            List<Vector2> points = newLine.GetComponent<Line>().GetPoints();
-            Debug.Log(points.Count);
+            List<Vector2> points = activeLine.GetPoints();
 
             if (points.Count > 1)
             {
@@ -66,8 +64,11 @@ public class LineGenerator : MonoBehaviour
 
             if (isAllSuccessful())
             {
+
                 GameOver();
             }
+
+            activeLine = null;
 
         }
 
@@ -76,6 +77,7 @@ public class LineGenerator : MonoBehaviour
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             activeLine.UpdateLine(mousePos);
         }
+
     }
 
     bool isPointsSuccessful(List<Vector2> points)
