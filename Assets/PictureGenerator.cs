@@ -118,7 +118,7 @@ public class PictureGenerator : MonoBehaviour
         // Calculate left and right pos based on screen width
         float leftPos = Camera.main.ScreenToWorldPoint(new Vector3(0, 0, 0)).x;
         float rightPos = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, 0, 0)).x;
-        int xPos = side == "left" ? (int)(leftPos + 1.3f) : (int)(rightPos - 0.6f);
+        int xPos = side == "left" ? (int)(leftPos + 1.3f) : (int)(rightPos - 1.3f);
         picture.transform.position = new Vector3(xPos, yPos, 0);
 
         // Set sprite size to match screen size. 2 pictures per row. 3 rows
@@ -132,8 +132,6 @@ public class PictureGenerator : MonoBehaviour
         // so that the sprite doesn't look stretched
         float scale = widthValue < heightValue ? widthValue : heightValue;
         picture.transform.localScale = new Vector3(scale, scale, 0);
-
-
 
         // Set collider size to match sprite size
         BoxCollider2D collider = picture.GetComponent<BoxCollider2D>();

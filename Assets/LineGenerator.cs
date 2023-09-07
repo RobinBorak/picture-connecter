@@ -9,20 +9,24 @@ public class LineGenerator : MonoBehaviour
     public GameOverScreen gameOverScreen;
     public GameObject PictureGenerator;
     List<PictureGenerator.Picture> pictures;
+    Line activeLine;
+    GameObject newLine;
+    bool gameOver = false;
 
     void Start()
     {
         pictures = PictureGenerator.GetComponent<PictureGenerator>().pictures;
     }
 
-    Line activeLine;
-    GameObject newLine;
-
     // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
+            if (gameOver)
+            {
+                return;
+            }
             Debug.Log("mouse down");
 
             newLine = Instantiate(linePrefab);
@@ -31,7 +35,14 @@ public class LineGenerator : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
+            // Active line is null when clicking playagain button.
+            if (gameOver || activeLine == null)
+            {
+                return;
+            }
             activeLine = null;
+
+            Debug.Log("mouse up");
             List<Vector2> points = newLine.GetComponent<Line>().GetPoints();
             Debug.Log(points.Count);
 
@@ -122,6 +133,7 @@ public class LineGenerator : MonoBehaviour
 
     public void Reset()
     {
+        gameOver = false;
         foreach (GameObject line in GameObject.FindGameObjectsWithTag("Line"))
         {
             Destroy(line);
@@ -130,6 +142,7 @@ public class LineGenerator : MonoBehaviour
 
     void GameOver()
     {
+        gameOver = true;
         gameOverScreen.Setup();
     }
 }

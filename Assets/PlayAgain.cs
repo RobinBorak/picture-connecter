@@ -1,9 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class PlayAgain : MonoBehaviour
+public class PlayAgain : MonoBehaviour, IPointerClickHandler
 {
+    //Detect if a click occurs
+    public void OnPointerClick(PointerEventData pointerEventData)
+    {
+        Debug.Log("PlayAgain Click");
+        Setup();
+    }
 
     public LineGenerator lineGenerator;
     public GameOverScreen gameOverScreen;
@@ -12,19 +19,9 @@ public class PlayAgain : MonoBehaviour
     // When clicking this button. Close the game over screen and start a new game.
     public void Setup()
     {
+        PictureGenerator.Reset();
         gameOverScreen.SetActive(false);
         lineGenerator.Reset();
-        PictureGenerator.Reset();
-    }
-
-    void Start()
-    {
-        Debug.Log("PlayAgain Start");
-        //find button component
-        GameObject button = GameObject.Find("PlayAgainButton");
-        //add listener to button
-        button.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(Setup);
-
     }
 
 }
