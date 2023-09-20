@@ -87,12 +87,12 @@ public class PictureGenerator : MonoBehaviour
         tmpRightYPositions.AddRange(rightYPositions);
         foreach (Picture picture in pictures)
         {
-            string side = "left"; // Random side seems to be a bit buggy
+            string side = Random.Range(0, 2) == 0 ? "left" : "right";
             int randomLeftYPosition = Random.Range(0, tmpLeftYPositions.Count);
             int randomRightYPosition = Random.Range(0, tmpRightYPositions.Count);
 
-            GameObject pictureGO = InstantiatePicture(picture.name, side, tmpLeftYPositions[randomLeftYPosition]);
-            GameObject counterPictureGO = InstantiatePicture(picture.counterName, side == "left" ? "right" : "left", tmpRightYPositions[randomRightYPosition]);
+            GameObject pictureGO = InstantiatePicture(picture.name, side, side == "left" ? tmpLeftYPositions[randomLeftYPosition] : tmpRightYPositions[randomRightYPosition]);
+            GameObject counterPictureGO = InstantiatePicture(picture.counterName, side == "left" ? "right" : "left", side == "left" ? tmpRightYPositions[randomRightYPosition] : tmpLeftYPositions[randomLeftYPosition]);
 
             picture.SetCollider(pictureGO.GetComponent<BoxCollider2D>());
             picture.SetCounterCollider(counterPictureGO.GetComponent<BoxCollider2D>());
