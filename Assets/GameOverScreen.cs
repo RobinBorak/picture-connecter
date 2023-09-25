@@ -9,7 +9,7 @@ public class GameOverScreen : MonoBehaviour
     {
         // For performance reasons, the GameOverScreen is active in the scene. here we deactivate it.
         // This increased performance to active it from 1700ms to 0-2ms.
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     public void Setup()
@@ -21,4 +21,6 @@ public class GameOverScreen : MonoBehaviour
     {
         gameObject.SetActive(active);
     }
+
+
 }
